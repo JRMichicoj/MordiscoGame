@@ -6,36 +6,36 @@
     G1 = [
       {
         name: "FACIL",
-        speedBase: 8,
-        speedRamp: 0.004,
-        speedMax: 4,
-        gapBase: 12,
-        gapRand: 6,
-        gapRamp: 0.008,
-        gapCap: 8,
-        weights: [45, 17, 6, 20, 8, 4],
+        sb: 8,
+        sr: 0.004,
+        sm: 4,
+        gb: 12,
+        gn: 6,
+        gp: 0.008,
+        gc: 8,
+        wt: [45, 17, 6, 20, 8, 4],
       },
       {
         name: "DIFICIL",
-        speedBase: 12,
-        speedRamp: 0.006,
-        speedMax: 6,
-        gapBase: 8,
-        gapRand: 5,
-        gapRamp: 0.01,
-        gapCap: 8,
-        weights: [35, 17, 8, 24, 10, 6],
+        sb: 12,
+        sr: 0.006,
+        sm: 6,
+        gb: 8,
+        gn: 5,
+        gp: 0.01,
+        gc: 8,
+        wt: [35, 17, 8, 24, 10, 6],
       },
       {
         name: "INFIERNO",
-        speedBase: 15,
-        speedRamp: 0.009,
-        speedMax: 9,
-        gapBase: 6,
-        gapRand: 3,
-        gapRamp: 0.006,
-        gapCap: 6,
-        weights: [18, 22, 10, 30, 12, 8],
+        sb: 15,
+        sr: 0.009,
+        sm: 9,
+        gb: 6,
+        gn: 3,
+        gp: 0.006,
+        gc: 6,
+        wt: [18, 22, 10, 30, 12, 8],
       },
     ];
   function Et(t) {
@@ -66,6 +66,8 @@
     _E = (o, k, f) => o.addEventListener(k, f),
     _N = () => performance.now(),
     _K = (a) => requestAnimationFrame(a);
+  Object.defineProperty(d, "a", { set: (v) => (d.globalAlpha = v) });
+  d.f = d.fillRect.bind(d);
   let r = 0,
     k = 0,
     at = 1;
@@ -82,44 +84,45 @@
       (at = s));
   }
   (_E(window, "resize", St), St());
-  let O = "TITLE",
-    i1 = "SIDE",
+  let O,
+    i1,
     A1 = 1,
-    m = 0,
-    p1 = 0,
-    Z = 0.5,
-    D1 = 0,
-    U = 0,
-    H = 0,
-    F1 = 0,
-    y1 = 0,
-    M1 = 0,
-    o1 = 0,
-    d1 = 0,
-    E1 = 0,
-    Z1 = 2.4,
-    k1 = 0,
-    z1 = 0,
-    U1 = 0,
-    m1 = [],
-    P1 = [],
-    Y1 = 0,
-    ct = 0,
-    rt = 0,
-    L1 = 0,
+    m,
+    p1,
+    Z,
+    D1,
+    U,
+    H,
+    F1,
+    y1,
+    M1,
+    o1,
+    d1,
+    E1,
+    Z1,
+    k1,
+    z1,
+    U1,
+    m1,
+    P1,
+    Y1,
+    ct,
+    rt,
+    L1,
     E = 0,
     Ls = 0,
-    C1 = 1,
-    B1 = 6,
-    V1 = 10,
-    j1 = 28,
+    C1,
+    B1,
+    V1,
+    j1,
     R1 = Number(Ot("mordisco_best") || 0),
     Q1 = Ot("mordisco_mute") === "1";
   const t1 = new Set();
-  let I1 = [],
-    v1 = 0,
-    S1 = [],
-    W1 = 10;
+  let I1,
+    v1,
+    S1,
+    W1 = 10,
+    bo;
   function Ot(t) {
     try {
       return localStorage.getItem(t);
@@ -142,47 +145,71 @@
       }
     return (T1 && T1.state === "suspended" && T1.resume(), T1);
   }
-  function e1(t, o, e, f, n) {
+  function e1(t, o, e, f, n, w = 0) {
     if (Q1) return;
     const a = X1();
     if (!a) return;
-    const c = a.createOscillator(),
+    const T = a.currentTime + w,
+      c = a.createOscillator(),
       l = a.createGain();
     ((c.type = e || "square"),
-      (c.frequency.value = t),
-      n &&
-        c.frequency.exponentialRampToValueAtTime(
-          x(30, t + n),
-          a.currentTime + o,
-        ),
-      (l.gain.value = f || 0.05),
-      l.gain.exponentialRampToValueAtTime(1e-4, a.currentTime + o),
+      c.frequency.setValueAtTime(t, T),
+      n && c.frequency.exponentialRampToValueAtTime(x(30, t + n), T + o),
+      l.gain.setValueAtTime(f || 0.05, T),
+      l.gain.exponentialRampToValueAtTime(1e-4, T + o),
       c.connect(l).connect(a.destination),
-      c.start(),
-      c.stop(a.currentTime + o));
+      c.start(T),
+      c.stop(T + o));
   }
+  let mi = 0,
+    nx = 0;
+  function mu() {
+    if (O !== "PLAY" || Q1 || !T1) return;
+    const d = T1.currentTime;
+    nx < d && (nx = d);
+    for (; nx < d + 0.12; nx += 0.19 - 0.003 * bo.n, mi++) {
+      const w = nx - d,
+        k = mi & 7,
+        b = (mi >> 3) & 3,
+        g = mi >> 5,
+        r = [0, -4, -2, -5][b],
+        s = 0.17 - 0.003 * bo.n,
+        q = [0, b ? 4 : 3, 7, 12, b ? 16 : 15];
+      (e1(73.4 * 2 ** ((r + ((k & 3) > 2) * 12) / 12), s, "square", 0.04, 0, w),
+        (k & 3) < 1 && e1(150, 0.12, "sine", 0.1, -120, w),
+        (k & 3) == 2 && e1(300, 0.09, "sawtooth", 0.04, -250, w),
+        m >= 1200 &&
+          g % 4 < 3 &&
+          e1(
+            293.7 * 2 ** ((r + q[(g & 1 ? "23432434" : "01210212")[k]]) / 12),
+            s * 0.9,
+            "square",
+            0.025,
+            0,
+            w,
+          ));
+    }
+  }
+  const SN = {
+    switch: [[620, 0.08, "triangle", 0.045, 320]],
+    coin: [[900, 0.1, "square", 0.04, 420]],
+    hit: [[120, 0.3, "sawtooth", 0.08, -70]],
+    bite: [[70, 0.35, "sawtooth", 0.06, -20]],
+    over: [[90, 0.9, "sawtooth", 0.09, -50]],
+    start: [[440, 0.12, "square", 0.05, 220]],
+  };
   function n1(t) {
-    t === "switch"
-      ? e1(620, 0.08, "triangle", 0.045, 320)
-      : t === "coin"
-        ? e1(900, 0.1, "square", 0.04, 420)
-        : t === "hit"
-          ? e1(120, 0.3, "sawtooth", 0.08, -70)
-          : t === "heal"
-            ? e1(500, 0.18, "sine", 0.05, 240)
-            : t === "bite"
-              ? e1(70, 0.35, "sawtooth", 0.06, -20)
-              : t === "over"
-                ? e1(90, 0.9, "sawtooth", 0.09, -50)
-                : t === "start"
-                  ? e1(440, 0.12, "square", 0.05, 220)
-                  : t === "heart"
-                    ? e1(60, 0.08, "sine", 0.035, 0)
-                    : t === "phase"
-                      ? e1(520, 0.16, "sine", 0.06, 260)
-                      : t === "zap" &&
-                        (e1(1100, 0.15, "square", 0.035, -800),
-                        e1(80, 0.35, "sawtooth", 0.05, 40));
+    (SN[t] || []).map((a) => e1(...a));
+  }
+  function hu(...q) {
+    ((U = F(3, U + 1)),
+      (H = 8),
+      (y1 = 0.18),
+      (o1 = 0.5),
+      (M1 = 1),
+      (d1 = 0.25),
+      q.map(n1),
+      U >= 3 && tt());
   }
   function It() {
     ((O = "PLAY"),
@@ -209,6 +236,7 @@
       (v1 = 0),
       (S1 = []),
       (Y1 = 25),
+      (bo = { s: 4, t: 1.5, l: [], n: 0, d: 0, on: 0, h: 0, a: 0 }),
       (ct = 0),
       (rt = 0),
       (L1 = 0),
@@ -219,7 +247,7 @@
       t1.clear());
   }
   function $1() {
-    (X1(), It(), n1("start"));
+    (X1(), It(), (mi = 0), n1("start"));
   }
   function Tt() {
     O !== "TITLE" && O !== "OVER"
@@ -239,22 +267,150 @@
       n1("over"));
   }
   function o0(t) {
-    ((t.hit = !0),
-      (t.type === "bar"
+    ((t.h = !0),
+      (t.t === "bar"
         ? i1 === "FRONT"
-          ? t.y0 > 0.3
-          : Z > t.y1 + 0.03 || Z < t.y0 - 0.03
-        : t.type === "slot"
-          ? i1 === "FRONT" && N(p1 - t.gap) < t.gw + 0.03
+          ? t.a > 0.3
+          : Z > t.b + 0.03 || Z < t.a - 0.03
+        : t.t === "slot"
+          ? i1 === "FRONT" && N(p1 - t.g) < t.w + 0.03
           : i1 === "SIDE") ||
-        ((U = F(3, U + 1)),
-        (H = 8),
-        (y1 = 0.18),
-        (o1 = 0.5),
-        (M1 = 1),
-        (d1 = 0.25),
-        n1("hit"),
-        U >= 3 && tt()));
+        hu("hit"));
+  }
+  function bu(t) {
+    if (m < 1200 || bo.d) return;
+    bo.on = 1;
+    if (bo.a < 1) {
+      bo.a = F(1, bo.a + t / 1.2);
+      return;
+    }
+    if ((bo.t -= t) > 0) {
+      if (bo.s === 1 || bo.s === 2) {
+        const c = bo.l.some((i) => N(Z - 0.84 + 0.16 * i) < 0.08),
+          q = bo.s === 1 ? bo.t / 0.3 : 0;
+        c &&
+          (i1 !== "SIDE" || q * r <= 0.3 * r + F1) &&
+          !bo.h &&
+          ((bo.h = 1), hu("hit"));
+      }
+      return;
+    }
+    const s = (bo.s + 1) % 5;
+    if (s === 0) {
+      const k = A1 > 1 && bo.n > 2 ? 2 : 1,
+        L = [];
+      for (; L.length < k;) {
+        const c = M(5 * _R());
+        !L.includes(c) && (L.length || !bo.l.includes(c)) && L.push(c);
+      }
+      ((bo.l = L), bo.n++, (bo.h = 0));
+    }
+    s === 4 && bo.n >= 10
+      ? ((bo.d = 1), (bo.on = 0))
+      : ((bo.s = s),
+        (bo.t = [[0.8, 0.6, 0.45][A1], 0.3, 0.35, 0.45, [0.5, 0.35, 0.25][A1]][s]));
+  }
+  function tn(a, b, c, e, u0, u1, ph, wv) {
+    const dx = c - a,
+      dy = e - b,
+      l = _H(dx, dy) || 1,
+      n = F(90, M(l / 2.5) + 2);
+    for (const g of [0, 1, 2])
+      for (let j = 0; j <= n; j++) {
+        const u = j / n,
+          w = T(7 * u - 4 * E + ph) * wv * ((u0 + u1) / 2) * u,
+          p = a + dx * u - (dy / l) * w,
+          y = b + dy * u + (dx / l) * w,
+          q = (u0 + (u1 - u0) * u) / 2 + 1 - g;
+        (g > 1
+          ? i(p - q, y - 1.5 * q, q, q, "#c8408a")
+          : i(p - q, y - q, 2 * q, 2 * q, g ? "#8a1c58" : q1),
+          g && (j + 4 * E) % 5 < 1 && i(p - 1, y + 0.2 * q, 2, 2, "#ff7096"));
+      }
+  }
+  let bk = 0,
+    bc;
+  function bm(R, f, l) {
+    if (bk !== 2 * R + f) ((bk = 2 * R + f), (bc = {}));
+    if (bc[l]) return bc[l];
+    const Z = h(3.4 * R),
+      c = _D(),
+      g = ((c.width = c.height = Z), _G(c)),
+      o = Z / 2,
+      P = f
+        ? [[0, -0.3, 0.85, 1.05], [0, 0.3, 0.95, 0.7]]
+        : [[0.3, -0.3, 0.8, 1.05], [-0.15, 0.25, 0.8, 0.8]],
+      S = (X, Y) => {
+        let b = 9,
+          a = 0,
+          z = 0;
+        for (const e of P) {
+          const u = ((X + 0.5 - o) / R - e[0]) / e[2],
+            v = ((Y + 0.5 - o) / R - e[1]) / e[3],
+            s = u * u + v * v;
+          s < b && ((b = s), (a = u), (z = v));
+        }
+        return [b, a, z];
+      };
+    for (let Y = 0; Y < Z; Y++)
+      for (let X = 0; X < Z; X++) {
+        const [b, u, v] = S(X, Y),
+          A = (X + 0.5 - o) / R,
+          B = (Y + 0.5 - o) / R;
+        let p;
+        if (b < 1) {
+          let n = M(2 + 2.2 * (0.6 * _Q(1 - b) - 0.5 * u - 0.6 * v) + 0.12 * ([0, 2, 3, 1][(X & 1) + 2 * (Y & 1)] - 1.5));
+          for (const q of [[0.15, -0.9, 0.12], [0.5, -0.6, 0.1], [-0.05, -0.5, 0.08], [0.4, -0.15, 0.1], [0.7, -0.9, 0.07], [0.1, -0.15, 0.06], [0.3, -0.8, 0.1]])
+            ((f ? N(A) : A) - q[0]) ** 2 + (B - q[1]) ** 2 < q[2] * q[2] && n++;
+          p = ["#301", "#614", "#816", "#b37", "#e69", "#fad"][x(0, F(5, n))];
+          for (const e of f ? [-0.42, 0.42] : [-0.5]) {
+            const a = A - e,
+              c = B - (f ? 0.2 : 0.1),
+              s = a * a + c * c;
+            s < 0.06 && (p = l ? (N(c) < 0.04 ? "#301" : p) : s < 0.03 ? (N(a) < 0.13 && N(c) < 0.04 ? "#100" : (a + 0.1) ** 2 + (c + 0.1) ** 2 < 0.004 ? "#fff" : "#fe6") : "#102");
+          }
+        } else [1, -1].some((j) => S(X + j, Y)[0] < 1 || S(X, Y + j)[0] < 1) && (p = q1);
+        p && ((g.fillStyle = p), g.fillRect(X, Y, 1, 1));
+      }
+    return (bc[l] = c);
+  }
+  function bb(f) {
+    if (!bo.on) return;
+    const R = h((f ? 0.11 : 0.26) * k);
+    let c = f ? r / 2 : h(r - 0.75 * R);
+    const y = f ? 0.46 * k : 0.45 * k;
+    if (f) d.a = 0.85 * F(1, bo.a * 1.5);
+    else c += (1 - bo.a) * R * 2.2;
+    for (let j = 0; j < 4; j++) {
+      const s = j - 1.5;
+      f
+        ? tn(c + 0.6 * R * s, y + 0.6 * R, c + 1.7 * R * s + 3 * T(2 * E + j), y + 1.6 * R, 0.08 * k, 0.03 * k, j, 0.3)
+        : tn(c - 0.3 * R, y + 0.5 * R * s, c - R * (1.2 + 0.4 * (j & 1)), y + 1.1 * R * s + 4 * T(2 * E + j), 0.09 * k, 0.04 * k, j, 0.3);
+    }
+    const B = bm(R, f, E % 4 < 0.15);
+    (d.drawImage(B, h(c - B.width / 2), h(y + 0.1 * R - B.width / 2 + 1.5 * T(2 * E))), (d.a = 1));
+  }
+  function bq(f) {
+    if (!bo.on || bo.s > 3) return;
+    const s = bo.s,
+      e = s === 1 ? bo.t / 0.3 : s === 2 ? 0 : s === 3 ? 1 - bo.t / 0.45 : 1;
+    for (const c of bo.l)
+      if (!f) {
+        const y = h1(0.84 - 0.16 * c),
+          g = 0.1152 * k;
+        s
+          ? tn(r + 4, y, r * e, y, g, 0.8 * g, c, 0.2)
+          : i(0, y - g / 2, r, g, "rgba(255,200,60,.3)");
+      } else {
+        const p = -0.688 + 0.344 * c,
+          v = K1(3 + (s ? 53 * e : 0)),
+          x0 = r / 2 + p * v.hw * 0.86,
+          w = 0.344 * v.hw * 0.86,
+          y = 0.46 * k + 0.414 * k * v.s;
+        s
+          ? tn(r / 2, 0.52 * k, x0, 0.46 * k + 0.37 * k * v.s, 0.03 * k, w, c, 0.1)
+          : i(x0 - w / 2, y, w, k - y, "rgba(255,200,60,.3)");
+      }
   }
   function it() {
     return F(1, U / 3 + (H > 0 ? F(0.22, ((8 - H) / 8) * 0.22) : 0));
@@ -271,11 +427,11 @@
         o1 > 0 && (o1 = x(0, o1 - 1.6 * t)),
         d1 > 0 && (d1 = x(0, d1 - 2.2 * t)),
         U > 0
-          ? ((U1 -= t), U1 <= 0 && ((U1 = Rt(1.3, 0.5, U / 3)), n1("heart")))
+          ? ((U1 -= t), U1 <= 0 && (U1 = Rt(1.3, 0.5, U / 3)))
           : (U1 = 0.6),
         H > 0 &&
           ((H -= t),
-          H <= 0 && ((H = 0), U > 0 && (U--, n1("heal"), U > 0 && (H = 8)))),
+          H <= 0 && ((H = 0), U > 0 && (U--, U > 0 && (H = 8)))),
         y1 > 0 && (y1 = x(0, y1 - t)));
       const f = H > 0 ? x(0.4, 1 - 0.2 * U) : 1;
       if (
@@ -302,19 +458,19 @@
             (Z = Et(p1)));
         }
         const n = G1[A1],
-          a = (n.speedBase + F(m * n.speedRamp, n.speedMax)) * f;
+          a = (n.sb + F(m * n.sr, n.sm)) * f;
         ((D1 = m), (m += a * t), (W1 = a));
         const c = M(m / 300) + 1;
-        (c > C1 && ((C1 = c), n1("phase")),
+        (c > C1 && (C1 = c),
           (L1 = M(m) + 10 * rt),
           (function () {
             const l = G1[A1];
-            for (; Y1 < m + 70;) {
+            for (; Y1 < (bo.d ? m + 70 : F(m + 70, 1200));) {
               let s;
               if (ct < 3) s = "bar";
               else {
                 const p = 100 * _R(),
-                  g = l.weights;
+                  g = l.wt;
                 s =
                   p < g[0]
                     ? "bar"
@@ -332,62 +488,63 @@
                 ? (s = "")
                 : s === "piraña" && C1 < 3 && (s = ""),
                 s === "reward"
-                  ? P1.push({ z: Y1, y: 0.25 + 0.5 * _R(), got: !1 })
+                  ? P1.push({ z: Y1, y: 0.25 + 0.5 * _R(), g: !1 })
                   : s === "medusa"
                     ? I1.push({
                         z: Y1,
                         y: 0.14 + 0.55 * _R(),
-                        vy: 0.05 + 0.035 * _R(),
-                        ph: 6.28 * _R(),
-                        hit: 0,
+                        v: 0.05 + 0.035 * _R(),
+                        p: 6.28 * _R(),
+                        h: 0,
                         e: 0,
                       })
                     : s === "piraña"
                       ? S1.push({
                           z: Y1,
                           y: 0.14 + 0.62 * _R(),
-                          ph: 6.28 * _R(),
+                          p: 6.28 * _R(),
                           s: 0,
                           k: 0,
-                          vz: 0,
-                          vy: 0,
+                          u: 0,
+                          v: 0,
                         })
                       : s &&
                         (function () {
                           const p = {
                             z: Y1,
-                            type: s,
-                            hit: !1,
-                            sd: M(99 * _R()),
+                            t: s,
+                            h: !1,
+                            d: M(99 * _R()),
                           };
                           (s === "bar"
-                            ? ((p.low = _R() < 0.5),
-                              (p.y0 = p.low ? 0 : 0.62),
-                              (p.y1 = p.low ? 0.38 : 1))
+                            ? ((p.l = _R() < 0.5),
+                              (p.a = p.l ? 0 : 0.62),
+                              (p.b = p.l ? 0.38 : 1))
                             : s === "slot" &&
-                              ((p.gap = 1.4 * _R() - 0.7),
-                              (p.gw = 0.3 + 0.1 * _R())),
+                              ((p.g = 1.4 * _R() - 0.7),
+                              (p.w = 0.3 + 0.1 * _R())),
                             m1.push(p));
                         })(),
                 ct++,
                 (Y1 +=
-                  l.gapBase + _R() * l.gapRand + F(m * l.gapRamp, l.gapCap)));
+                  l.gb + _R() * l.gn + F(m * l.gp, l.gc)));
             }
           })());
-        for (const l of m1) !l.hit && D1 < l.z && m >= l.z && o0(l);
+        for (const l of m1) !l.h && D1 < l.z && m >= l.z && o0(l);
         for (const l of P1)
-          !l.got &&
+          !l.g &&
             D1 < l.z &&
             m >= l.z &&
             i1 === "SIDE" &&
             N(Z - l.y) < 0.28 &&
-            ((l.got = !0),
+            ((l.g = !0),
             rt++,
             U > 0 && H > 0 && (H = x(0.001, H - 2)),
             n1("coin"));
         ((m1 = m1.filter((l) => l.z > m - 25)),
-          (P1 = P1.filter((l) => l.z > m - 25 && !l.got)),
+          (P1 = P1.filter((l) => l.z > m - 25 && !l.g)),
           P0(t),
+          bu(t),
           E0(t));
       }
     } else
@@ -421,23 +578,18 @@
     n && (d.fillStyle = n);
     const a = h(t),
       c = h(o);
-    d.fillRect(a, c, h(t + e) - a, h(o + f) - c);
-  }
-  function pt(t, o, e, f) {
-    ((d.fillStyle = f), (t = h(t)), (o = h(o)));
-    for (let n = -e; n <= e; n++) {
-      const a = M(_Q(e * e - n * n + 0.3 * e));
-      d.fillRect(t - a, o + n, 2 * a + 1, 1);
-    }
+    d.f(a, c, h(t + e) - a, h(o + f) - c);
   }
   function X(t, o, e, f, n) {
-    ((d.globalCompositeOperation = "lighter"),
-      (d.globalAlpha = n),
-      pt(t, o, e, f),
-      pt(t, o, (0.7 * e) | 0, f),
-      pt(t, o, (0.4 * e) | 0, f),
-      (d.globalAlpha = 1),
-      (d.globalCompositeOperation = "source-over"));
+    (d.save(),
+      (d.shadowColor = f),
+      (d.shadowBlur = e),
+      (d.a = n),
+      (d.fillStyle = f),
+      d.beginPath(),
+      d.arc(t, o, e, 0, 6.283),
+      d.fill(),
+      d.restore());
   }
   function u1(t, o) {
     const e = t[0].length,
@@ -481,7 +633,7 @@
         if (A)
           for (let I = 0; I < 15; I++)
             (A >> (14 - I)) & 1 &&
-              d.fillRect(
+              d.f(
                 l + p + 4 * y * f + (I % 3) * f,
                 e + g + ((I / 3) | 0) * f,
                 f,
@@ -514,28 +666,9 @@
       e: "#0d1126",
     },
     r0 = { ...Lt, b: "#dba3b6", h: "#ffe0e8", d: "#a85c7c" },
-    l0 = [
-      "....",
-      "....",
-      "k...",
-      "kk..",
-      "kok.",
-      "kOok",
-      "kok.",
-      "kk..",
-      "k...",
-    ],
-    i0 = [
-      "....",
-      "k...",
-      "kk..",
-      "kok.",
-      "kOok",
-      "kok.",
-      "kk..",
-      "k...",
-      "....",
-    ],
+    tl = ["k...", "kk..", "kok.", "kOok", "kok.", "kk..", "k..."],
+    l0 = ["....", "....", ...tl],
+    i0 = ["....", ...tl, "...."],
     s0 = [
       "..kkkk......",
       ".koOOok.....",
@@ -664,36 +797,20 @@
       "...kkkkkkkkkk.",
       "..............",
     ],
-    w0 = [
-      [
-        ".....",
-        "....k",
-        "...kk",
-        "..kFk",
-        ".kfFk",
-        "kfFfk",
-        "kffFk",
-        "kfFfk",
-        ".kfFk",
-        "..kFk",
-        "...kk",
-        "....k",
-      ],
-      [
-        ".....",
-        ".....",
-        "...kk",
-        "..kFk",
-        ".kfFk",
-        "kfFfk",
-        "kffFk",
-        "kfFfk",
-        ".kfFk",
-        "..kFk",
-        "...kk",
-        ".....",
-      ],
-    ],
+    w0 = ((a) => [a, a.map((r, i) => (i % 10 === 1 ? "....." : r))])([
+      ".....",
+      "....k",
+      "...kk",
+      "..kFk",
+      ".kfFk",
+      "kfFfk",
+      "kffFk",
+      "kfFfk",
+      ".kfFk",
+      "..kFk",
+      "...kk",
+      "....k",
+    ]),
     y0 = [0, 1].map((t) =>
       w0.map((o) =>
         u1(
@@ -723,12 +840,8 @@
     for (const o of S1) {
       const e = m - o.z,
         f = 20 * (Z - o.y);
-      if (((o.k += t), o.s === 0))
-        e < 0 &&
-          _H(e, f) < 13 + 0.5 * W1 &&
-          ((o.s = 1), (o.k = 0), e1(900, 0.12, "square", 0.03, -500));
-      else if (o.s === 1) {
-        if (o.k > 0.3) {
+      if (((o.k += t), o.s === 0)) {
+        if (e < 0 && _H(e, f) < 13 + 0.5 * W1) {
           const n = W1,
             a = 28 + n,
             c = e * e + f * f,
@@ -737,26 +850,20 @@
               (2 * e * n + _Q(4 * (a * a * c - n * n * f * f))) /
                 (2 * (a * a - n * n)),
             );
-          ((o.vz = (e + n * l) / l),
-            (o.vy = f / l / 20),
-            (o.tz = m + n * l),
-            (o.ty = Z),
-            (o.s = 2),
-            e1(160, 0.25, "sawtooth", 0.05, -80));
+          ((o.u = (e + n * l) / l),
+            (o.v = f / l / 20),
+            (o.x = m + n * l),
+            (o.j = Z),
+            (o.s = 1),
+            (o.k = 0),
+            e1(900, 0.12, "square", 0.03, -500));
         }
-      } else ((o.z += o.vz * t), (o.y += o.vy * t));
+      } else if (o.s === 1) {
+        o.k > 0.3 && ((o.s = 2), e1(160, 0.25, "sawtooth", 0.05, -80));
+      } else ((o.z += o.u * t), (o.y += o.v * t));
       !o.q &&
         _H(m - o.z, 20 * (Z - o.y)) < 2.6 &&
-        ((o.q = 1),
-        (U = F(3, U + 1)),
-        (H = 8),
-        (y1 = 0.18),
-        (o1 = 0.5),
-        (M1 = 1),
-        (d1 = 0.25),
-        n1("bite"),
-        n1("hit"),
-        U >= 3 && tt());
+        ((o.q = 1), hu("bite", "hit"));
     }
     S1 = S1.filter((o) => !o.q && o.z > m - 25 && o.z < m + 120);
   }
@@ -766,26 +873,24 @@
     for (const f of S1) {
       if (f.z < m - 16 || f.z > m + 45) continue;
       let n = t(f.z),
-        a = h1(f.y) + T(1.7 * E + f.ph),
+        a = h1(f.y) + T(1.7 * E + f.p),
         c = o - n,
         l = e - a;
       const s = f.s;
+      s
+        ? n > t(f.x) && pl(n, a, t(f.x), h1(f.j))
+        : m < f.z &&
+          _H(m - f.z, 20 * (Z - f.y)) < 30 + 0.5 * W1 &&
+          pl(n, a, o, e, 1);
       s === 2
-        ? n > t(f.tz) && pl(n, a, t(f.tz), h1(f.ty))
-        : s === 1
-          ? pl(n, a, o, e)
-          : m < f.z &&
-            _H(m - f.z, 20 * (Z - f.y)) < 30 + 0.5 * W1 &&
-            pl(n, a, o, e, 1);
-      s === 2
-        ? ((c = ((f.vz - W1) * r) / 60), (l = -f.vy * 0.72 * k))
+        ? ((c = ((f.u - W1) * r) / 60), (l = -f.v * 0.72 * k))
         : s === 1 && ((n += h(2 * T(90 * E))), (a += h(2 * T(77 * E))));
       const p = c > 0 ? -1 : 1,
         g = h(3 * (_A(l, -N(c)) - _I)) / 3,
         b = _H(c, l) || 1;
       (s === 1 && X(n, a, 11, "#ff2a2a", 0.1),
         s === 2 &&
-          ((d.globalAlpha = 0.4),
+          ((d.a = 0.4),
           dt(
             n - (c / b) * 10,
             a - (l / b) * 10,
@@ -793,14 +898,14 @@
             a - (l / b) * 24,
             "#bff",
           ),
-          (d.globalAlpha = 1)),
+          (d.a = 1)),
         d.save(),
         d.translate(h(n), h(a)),
         d.scale(p, 1),
         d.rotate(g),
         d.drawImage(
-          y0[(E + f.ph) % 3.3 < 0.15 ? 1 : 0][
-            M((s === 2 ? 18 : 5) * E + f.ph) & 1
+          y0[(E + f.p) % 3.3 < 0.15 ? 1 : 0][
+            M((s === 2 ? 18 : 5) * E + f.p) & 1
           ],
           -9,
           -6,
@@ -817,19 +922,19 @@
         e +
         S(1.154 - 2.1 * t.y, -0.86, 0.86) * n.hw * 0.86 +
         (t.s === 1 ? h(2 * T(90 * E)) : 0),
-      s = f + 0.81 * n.hh + 1.2 * a * T(2.4 * E + t.ph),
+      s = f + 0.81 * n.hh + 1.2 * a * T(2.4 * E + t.p),
       p = x(2, h(11 * a)),
-      g = x(2, h(10 * a * (1 + 0.07 * T(5 * E + t.ph))));
+      g = x(2, h(10 * a * (1 + 0.07 * T(5 * E + t.p))));
     (t.s === 1 && X(l, s, h(8 * a) + 1, "#ff2a2a", 0.1 * c),
-      (d.globalAlpha = c),
+      (d.a = c),
       d.drawImage(
-        M0[(E + t.ph) % 3.3 < 0.15 ? 1 : 0],
+        M0[(E + t.p) % 3.3 < 0.15 ? 1 : 0],
         h(l - p / 2),
         h(s - g / 2),
         p,
         g,
       ),
-      (d.globalAlpha = 1));
+      (d.a = 1));
   }
   const O0 = u1(
     [
@@ -863,18 +968,18 @@
       const n = h(r / 2 + S(1.154 - 2.1 * f.y, -0.86, 0.86) * t.hw * 0.86);
       X(n, o + 6, 24, "#ff2a2a", 0.06 + 0.03 * T(12 * E));
       for (let a = 0; a < 10; a++)
-        ((d.globalAlpha = 0.08 * (1 - a / 10)),
+        ((d.a = 0.08 * (1 - a / 10)),
           i(n - 1, o + 14 + a * e, 3, e, "#ff2a2a"));
-      ((d.globalAlpha = 1), N1(O0, n - 7, o));
+      ((d.a = 1), N1(O0, n - 7, o));
     }
   }
   function pl(t, o, e, f, p) {
     const n = x(1, _C(x(N(e - t), N(f - o))));
-    d.globalAlpha = p ? 0.75 : 0.9;
+    d.a = p ? 0.75 : 0.9;
     for (let c = 0; c <= n; c++)
       (!p || (((c - M(20 * E)) % 6) + 6) % 6 < 2) &&
         i(t + ((e - t) * c) / n, o + ((f - o) * c) / n, 2, 2, "#ff2a2a");
-    d.globalAlpha = 1;
+    d.a = 1;
   }
   function dt(t, o, e, f, n) {
     const a = x(1, _C(x(N(e - t), N(f - o))));
@@ -918,10 +1023,10 @@
     for (const o of I1) {
       if (o.z < m - 4 || o.z > m + 45) continue;
       const e = t(o.z),
-        f = h1(o.y) + 1.5 * T(2.4 * E + o.ph),
-        n = o.hit && (o.e > 0 || M(9 * E + o.ph) % 4 == 0) ? 1 : 0;
+        f = h1(o.y) + 1.5 * T(2.4 * E + o.p),
+        n = o.h && (o.e > 0 || M(9 * E + o.p) % 4 == 0) ? 1 : 0;
       (X(e, f, 12, n ? "#3fe6ff" : "#ff4d7d", n ? 0.1 : 0.05),
-        N1(Dt[n][M(3 * E + o.ph) & 1], e - 5, f - 6),
+        N1(Dt[n][M(3 * E + o.p) & 1], e - 5, f - 6),
         n && ut(e, f, 2, 9, M(14 * E), 0));
     }
   }
@@ -934,36 +1039,28 @@
         S((1.25 - N(t.x)) / 0.3, 0, 1);
     if (c < 0.02) return;
     const l = e + t.x * n.hw * 0.86,
-      s = f + 0.81 * n.hh + 1.2 * a * T(2.4 * E + t.ph),
-      p = t.hit && (t.e > 0 || M(9 * E + t.ph) % 4 == 0) ? 1 : 0,
+      s = f + 0.81 * n.hh + 1.2 * a * T(2.4 * E + t.p),
+      p = t.h && (t.e > 0 || M(9 * E + t.p) % 4 == 0) ? 1 : 0,
       g = x(2, h(11 * a)),
       b = x(2, h(13 * a));
     (X(l, s, h(9 * a) + 1, p ? "#3fe6ff" : "#ff4d7d", (p ? 0.1 : 0.05) * c),
-      (d.globalAlpha = c),
-      d.drawImage(Dt[p][M(3 * E + t.ph) & 1], h(l - g / 2), h(s - b / 2), g, b),
-      (d.globalAlpha = 1),
+      (d.a = c),
+      d.drawImage(Dt[p][M(3 * E + t.p) & 1], h(l - g / 2), h(s - b / 2), g, b),
+      (d.a = 1),
       p && c > 0.3 && ut(l, s, 2, 9 * a, M(14 * E), 0));
   }
   function z0(t) {
-    ((t.hit = 1),
+    ((t.h = 1),
       (t.e = 0.8),
       (v1 = 0.55),
-      (U = F(3, U + 1)),
-      (H = 8),
-      (y1 = 0.18),
-      (o1 = 0.5),
-      (M1 = 1),
-      (d1 = 0.25),
-      n1("zap"),
-      n1("hit"),
-      U >= 3 && tt());
+      hu("hit"));
   }
   function P0(t) {
     for (const o of I1)
-      ((o.y = F(0.96, o.y + o.vy * t)),
+      ((o.y = F(0.96, o.y + o.v * t)),
         (o.x = S(1.154 - 2.1 * o.y, -0.86, 0.86)),
         o.e > 0 && (o.e -= t),
-        !o.hit &&
+        !o.h &&
           D1 < o.z &&
           m >= o.z &&
           (i1 === "SIDE" ? N(Z - o.y) < 0.09 : N(p1 - o.x) < 0.13) &&
@@ -1002,7 +1099,7 @@
             M(2.6 * w(9 * M((A + q) / 8 + $ / 14) + 3 * b + n)) +
             (c1 < 0.5 ? 1 : 0) -
             ($ > I + 0.5 * C ? 1 : 0);
-          ((d.fillStyle = a[S(Q, 0, g)]), d.fillRect(g1, $, 1, F(6, K - $)));
+          ((d.fillStyle = a[S(Q, 0, g)]), d.f(g1, $, 1, F(6, K - $)));
         }
         c && K > v && (i(g1, v, 1, 1, c), i(g1, K - 1, 1, 1, a[0]));
       }
@@ -1048,12 +1145,12 @@
                 60) %
                 (r + 60)) -
               30;
-            ((d.globalAlpha = 0.045),
-              d.fillRect(h(p), h(l), h(36 + 30 * w(s + 9 * c)), 3),
-              d.fillRect(h(p) + 6, h(l) + 3, 24, 2));
+            ((d.a = 0.045),
+              d.f(h(p), h(l), h(36 + 30 * w(s + 9 * c)), 3),
+              d.f(h(p) + 6, h(l) + 3, 24, 2));
           }
         }
-        d.globalAlpha = 1;
+        d.a = 1;
       })(),
       Yt(
         t,
@@ -1068,19 +1165,7 @@
           L(a, [104, 158, 176], 0.32),
         ],
         L(a, [107, 163, 180], 0.3),
-      ),
-      (function (c) {
-        d.fillStyle = "#9fdcec";
-        const l = r / 60;
-        for (let s = 0; s < 34; s++) {
-          const p = 0.1 + 0.5 * w(s),
-            g = (((w(3 * s + 1) * r * 2 - c * l * p) % r) + r) % r,
-            b = (w(5 * s + 2) * k + E * (2 + 4 * p)) % k;
-          ((d.globalAlpha = T(2 * E + 2 * s) > 0 ? 0.5 : 0.22),
-            d.fillRect(h(g), h(b), 1, 1));
-        }
-        d.globalAlpha = 1;
-      })(t));
+      ));
     for (let c = 0; c < r; c++) {
       const l = t + (c - f - o) / e,
         s = h(c + n),
@@ -1124,13 +1209,13 @@
         [6, 0.14],
         [3, 0.14],
       ].forEach((t) => {
-        ((d.globalAlpha = t[1]),
-          d.fillRect(0, 0, r, t[0]),
-          d.fillRect(0, k - t[0], r, t[0]),
-          d.fillRect(0, t[0], t[0], k - 2 * t[0]),
-          d.fillRect(r - t[0], t[0], t[0], k - 2 * t[0]));
+        ((d.a = t[1]),
+          d.f(0, 0, r, t[0]),
+          d.f(0, k - t[0], r, t[0]),
+          d.f(0, t[0], t[0], k - 2 * t[0]),
+          d.f(r - t[0], t[0], t[0], k - 2 * t[0]));
       }),
-      (d.globalAlpha = 1));
+      (d.a = 1));
   }
   function Vt() {
     const t = it();
@@ -1143,14 +1228,14 @@
       [5, 1.4],
       [2, 1.8],
     ].forEach((f) => {
-      d.globalAlpha = e / f[1];
+      d.a = e / f[1];
       const n = f[0] * (0.5 + t);
-      (d.fillRect(0, 0, r, n),
-        d.fillRect(0, k - n, r, n),
-        d.fillRect(0, n, n, k - 2 * n),
-        d.fillRect(r - n, n, n, k - 2 * n));
+      (d.f(0, 0, r, n),
+        d.f(0, k - n, r, n),
+        d.f(0, n, n, k - 2 * n),
+        d.f(r - n, n, n, k - 2 * n));
     }),
-      (d.globalAlpha = 1));
+      (d.a = 1));
   }
   function jt(t, o, e, f) {
     const n = e < o ? -1 : 1,
@@ -1281,10 +1366,10 @@
     d.fillStyle = "#05030c";
     for (let y = 0; y <= a; y++) {
       const A = y < 0.4 * a ? 1 : 1 - (y - 0.4 * a) / (0.6 * a);
-      ((d.globalAlpha = _C(4 * S(A, 0, 1)) / 4),
-        d.fillRect(y, f.e[y], 1, n.e[y] - f.e[y]));
+      ((d.a = _C(4 * S(A, 0, 1)) / 4),
+        d.f(y, f.e[y], 1, n.e[y] - f.e[y]));
     }
-    ((d.globalAlpha = 1), qt(1, f, 0.1 * k), qt(-1, n, 0.1 * k));
+    ((d.a = 1), qt(1, f, 0.1 * k), qt(-1, n, 0.1 * k));
     const c = h(0.05 * r + 0.3 * Q),
       l = h(0.09 * k),
       s = 0.6 + 0.4 * T(3 * E);
@@ -1335,27 +1420,18 @@
     }
     (i(t, o, l, 1, p(2)), i(t, f - 1, l, 1, p(1)));
   }
-  function O1(t, o, e, f, n) {
-    const a = r / e;
-    for (let c = 0; c < e; c++) {
-      const l = (c + 0.5) * a + (n || 0);
-      for (let s = 0; s < f; s++) {
-        const p = a * (1 - s / f) * 0.94,
-          g = o > 0 ? t + s : t - s - 1;
-        (i(l - p / 2, g, p, 1, et),
-          s > 1 && p > 3 && i(l - 0.2 * p, g, 0.4 * p, 1, nt));
-      }
-    }
-  }
-  function Kt(t, o, e, f) {
-    const n = k / e;
-    for (let a = 0; a < e; a++) {
-      const c = (a + 0.5) * n;
-      for (let l = 0; l < f; l++) {
-        const s = n * (1 - l / f) * 0.94,
-          p = o > 0 ? t + l : t - l - 1;
-        (i(p, c - s / 2, 1, s, et),
-          l > 1 && s > 3 && i(p, c - 0.2 * s, 1, 0.4 * s, nt));
+  function _Z(t, o, e, f, n, a) {
+    const c = (a ? k : r) / e;
+    for (let l = 0; l < e; l++) {
+      const s = (l + 0.5) * c + (n || 0);
+      for (let p = 0; p < f; p++) {
+        const g = c * (1 - p / f) * 0.94,
+          y = o > 0 ? t + p : t - p - 1;
+        a
+          ? (i(y, s - g / 2, 1, g, et),
+            p > 1 && g > 3 && i(y, s - 0.2 * g, 1, 0.4 * g, nt))
+          : (i(s - g / 2, y, g, 1, et),
+            p > 1 && g > 3 && i(s - 0.2 * g, y, 0.4 * g, 1, nt));
       }
     }
   }
@@ -1366,7 +1442,7 @@
       i(0, e, r, 1, a1),
       i(0, k - e - 1, r, 1, a1));
     const f = h(r / 26);
-    (O1(e, 1, f, t, o), O1(k - e, -1, f, t, o));
+    (_Z(e, 1, f, t, o, 0), _Z(k - e, -1, f, t, o, 0));
   }
   let yt = null,
     Qt = "";
@@ -1436,86 +1512,29 @@
       o = 0.14 * k,
       e = 0.88 * k - o / 2;
     return [
-      { x: 0.21 * r - t / 2, y: e, w: t, h: o, action: "retry" },
-      { x: 0.83 * r - t / 2, y: e, w: t, h: o, action: "home" },
+      { x: 0.21 * r - t / 2, y: e, w: t, h: o, a: "retry" },
+      { x: 0.83 * r - t / 2, y: e, w: t, h: o, a: "home" },
     ];
   }
-  const TC = matchMedia("(pointer:coarse)").matches,
-    Ar = [
-      u1(["..w..", ".www.", "wwwww", "..w..", "wwwww", ".www.", "..w.."], {
-        w: nt,
-      }),
-      u1(["..w.w..", ".ww.ww.", "wwwwwww", ".ww.ww.", "..w.w.."], { w: nt }),
-    ];
-  function Rw(y, a) {
-    const u = a.map((s) => {
-      const c = "|@".indexOf(s[0]) + 1,
-        q = c ? s.slice(1) : s;
-      return [c, q, c > 1 ? (q == "v" ? 5 : 7) : 4 * q.length - 1];
-    });
-    let g = 0;
-    const P = u.map((e, j) => {
-        j && (g += u[j - 1][0] || e[0] > 1 ? 3 : 5);
-        const o = g;
-        return ((g += e[2]), o);
-      }),
-      z = h(r / 2 - g / 2);
-    u.forEach((e, j) => {
-      const a = z + P[j];
-      e[0] > 1
-        ? N1(Ar[+(e[1] == "h")], a, y + (e[1] == "v" ? 1 : 2))
-        : V(
-            e[1],
-            a,
-            y + 2,
-            1,
-            e[0] ? "#ffd23a" : e[1].endsWith(":") ? "#7fa8c8" : nt,
-            "l",
-            W,
-          );
-    });
-  }
+  const TC = matchMedia("(pointer:coarse)").matches;
   function Mn() {
-    const n = TC ? 3 : 2,
-      H = 10 * n + 15,
+    const H = 35,
       y = h((1.11 * k + 9 - H) / 2 + 4),
       v = h(F(r - 6, 196)),
-      a = h((r - v) / 2),
-      b = y - 4;
-    ((d.globalAlpha = 0.62),
-      i(a, b, v, H, W),
-      (d.globalAlpha = 1),
+      a = h((r - v) / 2);
+    ((d.a = 0.62),
+      i(a, y - 4, v, H, W),
+      (d.a = 1),
       (d.strokeStyle = a1),
-      d.strokeRect(a + 0.5, b + 0.5, v - 1, H - 1),
+      d.strokeRect(a + 0.5, y - 3.5, v - 1, H - 1),
       (TC
-        ? [
-            ["LATERAL:", "ARRASTRA", "@v", "ALTURA"],
-            ["FRONTAL:", "ARRASTRA", "@h", "ESQUIVAR"],
-            ["|TAP", "CAMBIAR VISTA"],
-          ]
-        : [
-            ["LATERAL:", "|W/A/S/D", " ", "FRONTAL:", "|A/D"],
-            ["|ESPACIO", "VISTA", " ", "|ESC", "PAUSA", " ", "|M", "SONIDO"],
-          ]
-      ).forEach((s, j) => Rw(y + 10 * j, s)),
-      V(
-        "3 CHOQUES Y TE COMEN",
-        r / 2 - 3,
-        y + 10 * n + 2,
-        1,
-        "#ff8aa0",
-        "r",
-        W,
-      ),
-      V(
-        "AGUANTA 8 S Y CURAS 1",
-        r / 2 + 3,
-        y + 10 * n + 2,
-        1,
-        "#8cf08c",
-        "l",
-        W,
-      ));
+        ? ["ARRASTRA PARA MOVER", "TAP CAMBIA DE VISTA"]
+        : ["W/A/S/D LATERAL  A/D FRONTAL", "ESPACIO VISTA  ESC PAUSA  M SONIDO"]
+      )
+        .concat("3 CHOQUES Y TE COMEN / AGUANTA 8 S Y CURAS 1")
+        .map((s, j) =>
+          V(s, r / 2, y + 10 * j + 2, 1, j > 1 ? "#ff8aa0" : nt, "c", W),
+        ));
   }
   function Ht() {
     const t = x(5, 0.02 * r),
@@ -1578,18 +1597,21 @@
           s = l[0].w >= 72 ? 2 : 1;
         for (let p = 0; p < 3; p++) Wt(l[p], G1[p].name, p === A1, s);
         T(3 * E) > -0.2 &&
-          Rw(
-            h(0.9 * k),
-            TC
-              ? [["|TAP", "ELIGE MODO Y EMPIEZA"]][0]
-              : ["|CLIC", "ELIGE MODO", " ", "|ESPACIO", "EMPIEZA"],
+          V(
+            TC ? "TAP ELIGE MODO Y EMPIEZA" : "CLIC ELIGE MODO  ESPACIO EMPIEZA",
+            r / 2,
+            h(0.9 * k) + 2,
+            1,
+            "#ffd23a",
+            "c",
+            W,
           );
       })();
     else if (O === "OVER")
       (function () {
         ((d.fillStyle = "#000"),
-          d.fillRect(0, 0, r, k),
-          (d.globalAlpha = _C(5 * (1 - E1)) / 5));
+          d.f(0, 0, r, k),
+          (d.a = _C(5 * (1 - E1)) / 5));
         const t = x(2, F(M((0.9 * r) / 43), M((0.1 * k) / 5))),
           o = k >= 150 ? 2 : 1,
           e = (s, c, y, z, q) => {
@@ -1604,13 +1626,13 @@
           e("MODO: " + G1[A1].name, r / 2, 0.72 * k, o, "#e8a010"));
         for (const n of _t())
           e(
-            n.action === "retry" ? "REINTENTAR" : "INICIO",
+            n.a === "retry" ? "REINTENTAR" : "INICIO",
             n.x + n.w / 2,
             0.88 * k,
             o,
-            n.action === "retry" ? "#fff" : "#ff1a1a",
+            n.a === "retry" ? "#fff" : "#ff1a1a",
           );
-        d.globalAlpha = 1;
+        d.a = 1;
       })();
     else if (
       (d.save(),
@@ -1624,22 +1646,22 @@
               o = 0.3 * r,
               e = O === "EATEN" && !Ls ? -0.13 * r : F1,
               f = (n) => o + e + (n - m) * t;
-            bt(m, e);
+            (bt(m, e), bb(0), bq(0));
             for (const n of P1)
-              n.got ||
+              n.g ||
                 n.z < m - 2 ||
                 n.z > m + 45 ||
                 v0(f(n.z), h1(n.y), 0.8 * T(6 * E + n.z));
             for (const n of m1) {
               if (n.z < m - 3 || n.z > m + 45) continue;
               const a = h(f(n.z));
-              if (n.type === "bar")
-                n.low
-                  ? jt(a, ft(n.z) + 3, h(h1(n.y1)), n.sd)
-                  : jt(a, gt(n.z) - 3, h(h1(n.y0)), n.sd);
-              else if (n.type === "slot") {
-                C0(a, gt(n.z) - 2, ft(n.z) + 3, n.sd);
-                const c = h(h1(Et(n.gap)));
+              if (n.t === "bar")
+                n.l
+                  ? jt(a, ft(n.z) + 3, h(h1(n.b)), n.d)
+                  : jt(a, gt(n.z) - 3, h(h1(n.a)), n.d);
+              else if (n.t === "slot") {
+                C0(a, gt(n.z) - 2, ft(n.z) + 3, n.d);
+                const c = h(h1(Et(n.g)));
                 (X(a, c, 11, "#20ff50", 0.07), N1(u0, a - 3, c - 4));
               } else L0(a, ft(n.z) + 1);
             }
@@ -1797,7 +1819,7 @@
               if (!u.o) {
                 const D = (8 / (8 + u.d)) * f(u.j);
                 if (u.d < -6) continue;
-                ((d.globalAlpha = S((54 - u.d) / 24, 0, 1)),
+                ((d.a = S((54 - u.d) / 24, 0, 1)),
                   d.drawImage(
                     yt[((u.j % 4) + 4) % 4],
                     h(t + (8 * n(u.j)) / (8 + u.d) - t * D),
@@ -1805,7 +1827,7 @@
                     h(r * D),
                     h(k * D),
                   ),
-                  (d.globalAlpha = 1));
+                  (d.a = 1));
                 continue;
               }
               const R = u.o,
@@ -1816,13 +1838,13 @@
                 G = t + 0.86 * v.hw,
                 Q = o - 0.9 * v.hh,
                 j = o + 0.9 * v.hh;
-              if (R.type === "bar") {
-                const D = o + (0.5 - R.y0) * v.hh * 1.62,
-                  J = o + (0.5 - R.y1) * v.hh * 1.62;
+              if (R.t === "bar") {
+                const D = o + (0.5 - R.a) * v.hh * 1.62,
+                  J = o + (0.5 - R.b) * v.hh * 1.62;
                 wt($, F(D, J), G, x(D, J), K, [n0, f0, a0], e);
-              } else if (R.type === "slot") {
-                const D = t + (R.gap - R.gw) * v.hw * 0.86,
-                  J = t + (R.gap + R.gw) * v.hw * 0.86,
+              } else if (R.t === "slot") {
+                const D = t + (R.g - R.w) * v.hw * 0.86,
+                  J = t + (R.g + R.w) * v.hw * 0.86,
                   P = [
                     [70, 52, 130],
                     [22, 14, 50],
@@ -1858,10 +1880,11 @@
                 }
               }
             }
+            bb(1);
             const I = K1(3),
               C = h(t + p1 * I.hw * 0.86),
               q = h(o + 0.81 * I.hh);
-            (mt(C, q, "R"), Ut(C, q));
+            (mt(C, q, "R"), Ut(C, q), bq(1));
             const g1 = F(1, it() + 0.35 * M1),
               c1 = h(1.4 * (0.015 * r + 0.085 * r * g1)),
               Y = h(2 + 0.3 * c1);
@@ -1874,10 +1897,10 @@
               i(0, k - Y - 1, r, 1, a1),
               i(Y, 0, 1, k, a1),
               i(r - Y - 1, 0, 1, k, a1),
-              O1(Y, 1, 12, c1),
-              O1(k - Y, -1, 12, c1),
-              Kt(Y, 1, 7, c1),
-              Kt(r - Y, -1, 7, c1),
+              _Z(Y, 1, 12, c1, 0, 0),
+              _Z(k - Y, -1, 12, c1, 0, 0),
+              _Z(Y, 1, 7, c1, 0, 1),
+              _Z(r - Y, -1, 7, c1, 0, 1),
               k1 > 0 && O === "PLAY")
             ) {
               const u = T(_I * F(1, k1 / 0.5)),
@@ -1887,8 +1910,8 @@
                 i(0, k - R, r, R, f1),
                 i(0, R, r, 1, a1),
                 i(0, k - R - 1, r, 1, a1),
-                O1(R, 1, 12, r1),
-                O1(k - R, -1, 12, r1));
+                _Z(R, 1, 12, r1, 0, 0),
+                _Z(k - R, -1, 12, r1, 0, 0));
             }
             (I0(), Bt(), Vt());
           })(),
@@ -1909,35 +1932,35 @@
             e = h(0.1 * k);
           (i(0, 0, r, o, f1),
             i(0, k - o, r, o, f1),
-            O1(o, 1, 12, e),
-            O1(k - o, -1, 12, e));
+            _Z(o, 1, 12, e, 0, 0),
+            _Z(k - o, -1, 12, e, 0, 0));
         }
         ((d.fillStyle = "#000"),
-          (d.globalAlpha = _C(6 * S(Ls ? (E1 - 0.6) / 0.4 : E1, 0, 1)) / 6),
-          d.fillRect(0, 0, r, k),
-          (d.globalAlpha = 1));
+          (d.a = _C(6 * S(Ls ? (E1 - 0.6) / 0.4 : E1, 0, 1)) / 6),
+          d.f(0, 0, r, k),
+          (d.a = 1));
       })();
     else {
       if (
         ((function () {
           if (z1 <= 0) return;
           const t = z1 / 0.16;
-          ((d.fillStyle = "#bff"), (d.globalAlpha = 0.5 + 0.5 * t));
+          ((d.fillStyle = "#bff"), (d.a = 0.5 + 0.5 * t));
           for (let o = 0; o < 9; o++) {
             const e = ((o + 0.5) / 9) * k,
               f = t > 0.5 ? 2 : 1;
-            d.fillRect(0, h(e), r, f);
+            d.f(0, h(e), r, f);
           }
-          d.globalAlpha = 1;
+          d.a = 1;
         })(),
         d1 > 0)
       ) {
         d.fillStyle = "#ffd6de";
         const t = h(x(1, 0.03 * r * d1));
-        (d.fillRect(0, 0, r, t),
-          d.fillRect(0, k - t, r, t),
-          d.fillRect(0, t, t, k - 2 * t),
-          d.fillRect(r - t, t, t, k - 2 * t));
+        (d.f(0, 0, r, t),
+          d.f(0, k - t, r, t),
+          d.f(0, t, t, k - 2 * t),
+          d.f(r - t, t, t, k - 2 * t));
       }
       ((function () {
         const t = r < 300 || at >= 3.2 ? 1 : 2,
@@ -1962,14 +1985,15 @@
             2,
             U > 1 ? "#ff6a80" : "#7fe8ff",
           ),
+          bo.on && bo.a >= 1 && V("ATAQUE " + bo.n + "/10", o, k - o - 5 * t, t, "#ffb0c8", "l", W),
           V(G1[A1].name, r - o, k - o - 5 * t, t, "#6b8fb0", "r", W));
       })(),
         O === "PAUSE" &&
           (function () {
             ((d.fillStyle = "#04030c"),
-              (d.globalAlpha = 0.8),
-              d.fillRect(0, 0, r, k),
-              (d.globalAlpha = 1));
+              (d.a = 0.8),
+              d.f(0, 0, r, k),
+              (d.a = 1));
             const t = x(2, F(M((0.5 * r) / 23), M((0.1 * k) / 5)));
             (i(0, 0.38 * k, r, 1, a1),
               i(0, 0.6 * k, r, 1, a1),
@@ -2062,7 +2086,7 @@
                 z.y <= e.y + e.h
               )
                 return (
-                  e.action === "retry" ? $1() : (It(), (O = "TITLE")),
+                  e.a === "retry" ? $1() : (It(), (O = "TITLE")),
                   void (z = null)
                 );
           } else Tt();
@@ -2074,12 +2098,13 @@
     }));
   let $t = _N(),
     Mt = 0;
+  (It(), (O = "TITLE"));
   _K(function t(o) {
     let e = (o - $t) / 1e3;
     (($t = o), e > 0.1 && (e = 0.1), (Mt += e));
     const f = 1 / 120;
     let n = 0;
     for (; Mt >= f && n++ < 8;) (e0(f), (Mt -= f));
-    (G0(), _K(t));
+    (mu(), G0(), _K(t));
   });
 })();
